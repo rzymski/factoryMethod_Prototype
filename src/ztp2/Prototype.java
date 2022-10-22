@@ -108,20 +108,11 @@ class TableHeader
     {
         this.type = type;
         switch (type) {
-            case "INT":
-                tableData = new TableDataInt();
-                break;
-            case "DOUBLE":
-                tableData = new TableDataDouble();
-                break;
-            case "CHAR":
-                tableData = new TableDataChar();
-                break;
-            case "BOOLEAN":
-                tableData = new TableDataBoolean();
-                break;
-            default:
-                tableData = null;
+            case "INT" -> tableData = new TableDataInt();
+            case "DOUBLE" -> tableData = new TableDataDouble();
+            case "CHAR" -> tableData = new TableDataChar();
+            case "BOOLEAN" -> tableData = new TableDataBoolean();
+            default -> tableData = null;
         }
     }
     public String toString() { return type; }
