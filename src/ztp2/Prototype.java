@@ -1,3 +1,5 @@
+package ztp2;
+
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.event.*;
@@ -13,15 +15,17 @@ class Database extends AbstractTableModel {
     }
     public void addRow() {
         List<TableData> row = new ArrayList<TableData>();
-        for(TableHeader col:headers)
-            row.add(new TableDataInt()); // wywołanie metody fabrykującej
+        for(TableHeader col:headers) {
+            row.add(col.createTable());// wywołanie metody fabrykującej
+        }
         data.add(row);
         fireTableStructureChanged();
     }
     public void addCol(TableHeader type) {
         headers.add(type);
-        for(List<TableData> row:data)
-            row.add(new TableDataInt()); // wywołanie metody fabrykującej
+        for(List<TableData> row:data) {
+            row.add(type.createTable());// wywołanie metody fabrykującej
+        }
         fireTableStructureChanged();
     }
 
@@ -45,16 +49,45 @@ class TableDataInt implements TableData
     public TableDataInt() { data = rnd.nextInt(100); }
     public String toString() { return Integer.toString(data); }
 }
-/* ... */
 
+class TableDataDouble implements TableData
+{
+    private double data;
+    public TableDataDouble() { data = rnd.nextInt(100) + rnd.nextInt(100)/100.0; }
+    public String toString() { return Double.toString(data); }
+}
+
+class TableDataChar implements TableData
+{
+    private char data;
+    public TableDataChar() { data = (char)rnd.nextInt(65, 91); }
+    public String toString() { return Character.toString(data); }
+}
+
+class TableDataBoolean implements TableData
+{
+    private boolean data;
+    public TableDataBoolean() { data = rnd.nextInt(2) > 0; }
+    public String toString() { return Boolean.toString(data); }
+}
+
+//factory method with parametr
 class TableHeader
 {
     private String type;
     public TableHeader(String type) { this.type = type; }
-    public String toString() { return type; }
+    public String toString() { return String.valueOf(type); }
+    public TableData createTable()
+    {
+        if(type.equals("INT")) return new TableDataInt();
+        if(type.equals("DOUBLE")) return new TableDataDouble();
+        if(type.equals("CHAR")) return new TableDataChar();
+        if(type.equals("BOOLEAN")) return new TableDataBoolean();
+        return null;
+    }
 }
 
-public class Main {
+public class Prototype {
     public static void main(String[] args) {
         final JFrame frame = new JFrame("Baza danych");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -91,6 +124,12 @@ public class Main {
                         "Dodaj Kolumnę",
                         JOptionPane.QUESTION_MESSAGE,
                         null,
+                        /*new ztp2.TableHeader[] {
+                                new TableHeaderInt(),
+                                new TableHeaderDouble(),
+                                new TableHeaderChar(),
+                                new TableHeaderBoolean(),
+                        }, null);*/
                         new TableHeader[] {
                                 new TableHeader("INT"),
                                 new TableHeader("DOUBLE"),
