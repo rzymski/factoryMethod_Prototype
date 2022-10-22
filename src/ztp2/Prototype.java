@@ -124,7 +124,7 @@ class TableHeader
                 tableData = null;
         }
     }
-    public String toString() { return String.valueOf(type); }
+    public String toString() { return type; }
     public TableData createTable()
     {
         return tableData.clone();

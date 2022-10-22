@@ -76,7 +76,7 @@ class TableHeader
 {
     private String type;
     public TableHeader(String type) { this.type = type; }
-    public String toString() { return String.valueOf(type); }
+    public String toString() { return type; }
     public TableData createTable()
     {
         if(type.equals("INT")) return new TableDataInt();
