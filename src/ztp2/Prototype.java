@@ -16,7 +16,7 @@ class Database extends AbstractTableModel {
     public void addRow() {
         List<TableData> row = new ArrayList<TableData>();
         for(TableHeader col:headers) {
-            row.add(col.createTable());// wywołanie metody fabrykującej
+            row.add(col.createTable());// wywołanie metody używającej prototypu
         }
         data.add(row);
         fireTableStructureChanged();
@@ -24,7 +24,7 @@ class Database extends AbstractTableModel {
     public void addCol(TableHeader type) {
         headers.add(type);
         for(List<TableData> row:data) {
-            row.add(type.createTable());// wywołanie metody fabrykującej
+            row.add(type.createTable());// wywołanie metody używającej prototypu
         }
         fireTableStructureChanged();
     }
@@ -39,51 +39,95 @@ class Database extends AbstractTableModel {
     }
 }
 
-interface TableData {
+abstract class TableData implements Cloneable{
     final static Random rnd = new Random();
+    @Override
+    public TableData clone() {
+        TableData obj = null;
+        try {
+            obj = (TableData) super.clone();
+            obj.setType();
+        } catch (CloneNotSupportedException ex) {
+        }
+        return obj;
+    }
+    protected abstract void setType();
+
 }
 
-class TableDataInt implements TableData
+class TableDataInt extends TableData
 {
     private int data;
-    public TableDataInt() { data = rnd.nextInt(100); }
+    public TableDataInt() { setType(); }
     public String toString() { return Integer.toString(data); }
+    @Override
+    protected void setType() {
+        data = rnd.nextInt(100);
+    }
 }
 
-class TableDataDouble implements TableData
+class TableDataDouble extends TableData
 {
     private double data;
-    public TableDataDouble() { data = rnd.nextInt(100) + rnd.nextInt(100)/100.0; }
+    public TableDataDouble() { setType(); }
     public String toString() { return Double.toString(data); }
+    @Override
+    protected void setType() {
+        data = rnd.nextInt(100) + rnd.nextInt(100)/100.0;
+    }
 }
 
-class TableDataChar implements TableData
+class TableDataChar extends TableData
 {
     private char data;
-    public TableDataChar() { data = (char)rnd.nextInt(65, 91); }
+    public TableDataChar() { setType(); }
     public String toString() { return Character.toString(data); }
+    @Override
+    protected void setType() {
+        data = (char)rnd.nextInt(65, 91);
+    }
 }
 
-class TableDataBoolean implements TableData
+class TableDataBoolean extends TableData
 {
     private boolean data;
-    public TableDataBoolean() { data = rnd.nextInt(2) > 0; }
+    public TableDataBoolean() { setType(); }
     public String toString() { return Boolean.toString(data); }
+    @Override
+    protected void setType() {
+        data = rnd.nextInt(2) > 0;
+    }
 }
 
-//factory method with parametr
+//prothotype
 class TableHeader
 {
     private String type;
-    public TableHeader(String type) { this.type = type; }
+    private TableData tableData;
+    public TableHeader(String type)
+    {
+        this.type = type;
+        switch (type) {
+            case "INT":
+                tableData = new TableDataInt();
+                break;
+            case "DOUBLE":
+                tableData = new TableDataDouble();
+                break;
+            case "CHAR":
+                tableData = new TableDataChar();
+                break;
+            case "BOOLEAN":
+                tableData = new TableDataBoolean();
+                break;
+            default:
+                tableData = null;
+        }
+    }
     public String toString() { return String.valueOf(type); }
     public TableData createTable()
     {
-        if(type.equals("INT")) return new TableDataInt();
-        if(type.equals("DOUBLE")) return new TableDataDouble();
-        if(type.equals("CHAR")) return new TableDataChar();
-        if(type.equals("BOOLEAN")) return new TableDataBoolean();
-        return null;
+        return tableData.clone();
     }
 }
 
