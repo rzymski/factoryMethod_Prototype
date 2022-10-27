@@ -52,6 +52,7 @@ abstract class TableData implements Cloneable{
         return obj;
     }
     protected abstract void setType();
+    protected abstract String getType();
 
 }
 
@@ -59,66 +60,96 @@ class TableDataInt extends TableData
 {
     private int data;
     public TableDataInt() { setType(); }
+    @Override
+    public TableData clone() {
+        TableDataInt obj = null;
+        obj = (TableDataInt) super.clone();
+        obj.setType();
+        return obj;
+    }
     public String toString() { return Integer.toString(data); }
     @Override
     protected void setType() {
         data = rnd.nextInt(100);
     }
+    @Override
+    protected String getType(){ return "INT";}
 }
 
 class TableDataDouble extends TableData
 {
     private double data;
     public TableDataDouble() { setType(); }
+    @Override
+    public TableData clone() {
+        TableDataDouble obj = null;
+        obj = (TableDataDouble) super.clone();
+        obj.setType();
+        return obj;
+    }
     public String toString() { return Double.toString(data); }
     @Override
     protected void setType() {
         data = rnd.nextInt(100) + rnd.nextInt(100)/100.0;
     }
+    @Override
+    protected String getType(){ return "DOUBLE";}
 }
 
 class TableDataChar extends TableData
 {
     private char data;
     public TableDataChar() { setType(); }
+    @Override
+    public TableData clone() {
+        TableDataChar obj = null;
+        obj = (TableDataChar) super.clone();
+        obj.setType();
+        return obj;
+    }
     public String toString() { return Character.toString(data); }
     @Override
     protected void setType() {
         data = (char)rnd.nextInt(65, 91);
     }
+    @Override
+    protected String getType(){ return "CHAR";}
 }
 
 class TableDataBoolean extends TableData
 {
     private boolean data;
     public TableDataBoolean() { setType(); }
+    @Override
+    public TableData clone() {
+        TableDataBoolean obj = null;
+        obj = (TableDataBoolean) super.clone();
+        obj.setType();
+        return obj;
+    }
     public String toString() { return Boolean.toString(data); }
     @Override
     protected void setType() {
         data = rnd.nextInt(2) > 0;
     }
+    @Override
+    protected String getType(){ return "BOOLEAN";}
 }
 
 //prothotype
 class TableHeader
 {
     private String type;
-    private TableData tableData;
-    public TableHeader(String type)
+    private TableData data;
+    public TableHeader(TableData tableData)
     {
-        this.type = type;
-        switch (type) {
-            case "INT" -> tableData = new TableDataInt();
-            case "DOUBLE" -> tableData = new TableDataDouble();
-            case "CHAR" -> tableData = new TableDataChar();
-            case "BOOLEAN" -> tableData = new TableDataBoolean();
-            default -> tableData = null;
-        }
+        data = tableData.clone();
+        this.type = data.getType();
     }
     public String toString() { return type; }
     public TableData createTable()
     {
-        return tableData.clone();
+        return data.clone();
     }
 }
 
@@ -144,6 +175,11 @@ public class Prototype {
         frame.pack();
         frame.setVisible(true);
 
+//        TableData tableInt = new TableDataInt();
+//        TableData tableDouble = new TableDataDouble();
+//        TableData tableChar = new TableDataChar();
+//        TableData tableBoolean = new TableDataBoolean();
+
         row.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent ev)
             {
@@ -159,18 +195,18 @@ public class Prototype {
                         "Dodaj Kolumnę",
                         JOptionPane.QUESTION_MESSAGE,
                         null,
-                        /*new ztp2.TableHeader[] {
-                                new TableHeaderInt(),
-                                new TableHeaderDouble(),
-                                new TableHeaderChar(),
-                                new TableHeaderBoolean(),
-                        }, null);*/
                         new TableHeader[] {
-                                new TableHeader("INT"),
-                                new TableHeader("DOUBLE"),
-                                new TableHeader("CHAR"),
-                                new TableHeader("BOOLEAN"),
+                                new TableHeader(new TableDataInt()),
+                                new TableHeader(new TableDataDouble()),
+                                new TableHeader(new TableDataChar()),
+                                new TableHeader(new TableDataBoolean()),
                         }, null);
+//                        new TableHeader[] {
+//                                new TableHeader(tableInt),
+//                                new TableHeader(tableDouble),
+//                                new TableHeader(tableChar),
+//                                new TableHeader(tableBoolean),
+//                        }, null);
                 if(option == null)
                     return;
                 database.addCol((TableHeader)option);
